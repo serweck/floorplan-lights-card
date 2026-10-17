@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1 · 2026-10-17
+
+- Se puede estirar mucho más: hasta 40 filas (30 la compacta); HA limitaba a 8 si la tarjeta no decía nada.
+
 ## 0.2.0 · 2026-10-17
 
 - Tamaño ajustable: en los paneles por secciones se puede cambiar alto y ancho de la tarjeta y el plano llena el espacio.

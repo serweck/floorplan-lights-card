@@ -7,7 +7,7 @@ import { styles } from "./styles";
 import "./editor";
 
 export const CARD_TAG = "floorplan-lights-card";
-export const CARD_VERSION = "0.2.0";
+export const CARD_VERSION = "0.2.1";
 /** Mantener pulsado más de esto abre el detalle de la luz en vez de encenderla. */
 const HOLD_MS = 500;
 
@@ -134,8 +134,9 @@ export class FloorplanLightsCard extends LitElement {
   getCardSize(): number { return this._config?.compact ? 6 : 9; }
 
   /** Tamaño en la cuadrícula de los paneles por secciones: se puede cambiar desde el editor de HA. */
-  getGridOptions(): { columns: number; rows: number; min_columns: number; min_rows: number } {
-    return this._config?.compact ? { columns: 12, rows: 6, min_columns: 4, min_rows: 3 } : { columns: 12, rows: 9, min_columns: 6, min_rows: 4 };
+  getGridOptions(): { columns: number; rows: number; min_columns: number; min_rows: number; max_rows: number } {
+    // Sin max_rows HA limita el alto a 8 filas, poco para un plano de casa.
+    return this._config?.compact ? { columns: 12, rows: 7, min_columns: 4, min_rows: 3, max_rows: 30 } : { columns: 12, rows: 12, min_columns: 6, min_rows: 4, max_rows: 40 };
   }
 
   protected shouldUpdate(changed: PropertyValues): boolean {

@@ -172,6 +172,6 @@ describe("diseño", () => {
   });
   it("tamaño ajustable en la cuadrícula de secciones", async () => {
     const { card } = await mount();
-    expect((card as unknown as { getGridOptions(): object }).getGridOptions()).toEqual({ columns: 12, rows: 9, min_columns: 6, min_rows: 4 });
+    expect((card as unknown as { getGridOptions(): object }).getGridOptions()).toEqual({ columns: 12, rows: 12, min_columns: 6, min_rows: 4, max_rows: 40 });
   });
 });
