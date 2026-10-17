@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>floorplan-lights-card · vista previa</title>
+<style>
+  body { background:#111; color:#e1e1e1; font-family:Roboto,"Segoe UI",sans-serif; padding:24px; margin:0;
+         --primary-text-color:#e1e1e1; --secondary-text-color:#9b9b9b; --card-background-color:#1c1c1c;
+         --ha-card-background:#1c1c1c; --secondary-background-color:#262626; --divider-color:#2c2c2c; }
+  ha-card { display:block; background:var(--ha-card-background); border:1px solid #2c2c2c; border-radius:16px; }
+  .wrap { display:flex; gap:24px; flex-wrap:wrap; align-items:flex-start; } .col { width:760px; max-width:100%; } .narrow { width:380px; }
+  h3 { font-weight:500; color:#9b9b9b; font-size:13px; margin:0 0 8px; } #log { font:12px monospace; color:#9b9b9b; white-space:pre; margin-top:16px; }
+</style></head><body>
+<div class="wrap">
+  <div class="col"><h3>Pestaña Luces (tema oscuro)</h3><div id="a"></div></div>
+  <div class="narrow"><h3>Inicio (compacta, config_from)</h3><div id="b"></div><h3 style="margin-top:20px">Editor de HA</h3><div id="c"></div></div>
+</div>
+<div id="log">Servicios:</div>
+<script type="module">
+  customElements.define("ha-icon", class extends HTMLElement {});
+  customElements.define("ha-card", class extends HTMLElement {});
+  await import("./dist/floorplan-lights-card.js");
+  // preview-config.json (fuera de git) es tu plano real; si no está, un plano de ejemplo.
+  const R = (x1, y1, x2, y2) => [[x1, y1], [x2, y1], [x2, y2], [x1, y2]];
+  const EXAMPLE = { type: "custom:floorplan-lights-card", title: "Luces", floors: [
+    { id: "pa", name: "Planta alta", short: "Alta", level: "1", outline: R(0, 0, 8, 6), walls: [[4, 0, 4, 6]], doors: [{ o: "v", at: 4, a: 2.5, b: 3.3 }],
+      rooms: [{ id: "d1", name: "Dormitorio", poly: R(0.1, 0.1, 3.95, 5.9) }, { id: "d2", name: "Estudio", poly: R(4.05, 0.1, 7.9, 5.9) }],
+      lights: [{ entity: "light.dormitorio", x: 2, y: 3 }, { entity: "light.estudio", x: 6, y: 2, color: "#3ccfff" }] },
+    { id: "pb", name: "Planta baja", short: "Baja", level: "0", outline: R(0, 0, 8, 6), walls: [[0, 3.5, 8, 3.5]], doors: [{ o: "h", at: 3.5, a: 3, b: 4 }, { o: "h", at: 6, a: 5, b: 6.2, k: "main" }],
+      rooms: [{ id: "salon", name: "Salón y comedor", poly: R(0.1, 0.1, 7.9, 3.45) }, { id: "cocina", name: "Cocina", poly: R(0.1, 3.55, 7.9, 5.9) },
+              { id: "terraza", name: "Terraza", ext: true, poly: R(0, -2.5, 8, 0) }],
+      labels: [{ text: "Jardín", x: 4, y: -1.2, fs: 0.36 }],
+      lights: [{ entity: "light.salon", x: 2, y: 1.8 }, { entity: "light.hue", x: 5.5, y: 1.8, color: "#b98cff" }, { entity: "light.cocina", x: 4, y: 4.7 }, { entity: "light.terraza", x: 1, y: -1.2, ext: true }] },
+  ] };
+  const res = await fetch("preview-config.json");
+  const card = res.ok ? await res.json() : EXAMPLE;
+  const st = (state, attributes = {}) => ({ state, attributes });
+  const states = {};
+  for (const f of card.floors) for (const l of f.lights) states[l.entity] = st("off", { friendly_name: l.name });
+  const first = card.floors.flatMap((f) => f.lights).slice(0, 3);
+  first.forEach((l, i) => { states[l.entity] = l.color ? st("on", { rgb_color: [185, 140, 255], brightness: 180 }) : st("on"); });
+  const log = document.getElementById("log");
+  const hass = { states, themes: { darkMode: true }, callService: async (d, s, data) => { log.textContent += `\n${d}.${s} ${JSON.stringify(data)}`; },
+    callWS: async () => ({ views: [{ path: "luces", sections: [{ cards: [card] }] }] }) };
+  const mk = (tag, cfg, el) => { const c = document.createElement(tag); c.setConfig(cfg); c.hass = hass; document.getElementById(el).appendChild(c); return c; };
+  mk("floorplan-lights-card", card, "a");
+  mk("floorplan-lights-card", { compact: true, config_from: "luces", title: "Luces" }, "b");
+  const ed = mk("floorplan-lights-card-editor", card, "c");
+  ed.addEventListener("config-changed", () => { log.textContent += "\nconfig-changed"; });
+</script></body></html>
