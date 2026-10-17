@@ -61,7 +61,7 @@ Para una portada que reutilice ese plano:
 ```yaml
 type: custom:floorplan-lights-card
 compact: true
-config_from: luces        # path de la pestaña que tiene la tarjeta completa
+config_from: luces        # path de la pestaña que tiene la tarjeta completa (o panel/pestaña, p. ej. dashboard-serweck-v2/luces)
 ```
 
 ## Desarrollo

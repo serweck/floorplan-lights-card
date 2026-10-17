@@ -7,7 +7,7 @@ import { styles } from "./styles";
 import "./editor";
 
 export const CARD_TAG = "floorplan-lights-card";
-export const CARD_VERSION = "0.2.1";
+export const CARD_VERSION = "0.2.2";
 /** Mantener pulsado más de esto abre el detalle de la luz en vez de encenderla. */
 const HOLD_MS = 500;
 
@@ -78,9 +78,12 @@ export class FloorplanLightsCard extends LitElement {
     if (this._floor && !(config.floors ?? []).some((f) => f.id === this._floor)) this._floor = undefined;
   }
 
-  private get _urlPath(): string | null {
-    const p = location.pathname.split("/")[1] || null;
-    return p === "lovelace" ? null : p;
+  /** Panel y pestaña de donde sale el plano: `luces` (panel actual) o `panel/luces`. */
+  private get _source(): { urlPath: string | null; view: string } {
+    const ref = this._config?.config_from ?? "";
+    const norm = (p: string | null) => (!p || p === "lovelace" ? null : p);
+    if (ref.includes("/")) { const [dash, view] = ref.split("/"); return { urlPath: norm(dash), view }; }
+    return { urlPath: norm(location.pathname.split("/")[1] || null), view: ref };
   }
 
   /** La planta se elige una vez (al abrir); después solo cambia cuando la elige el usuario. */
@@ -95,7 +98,7 @@ export class FloorplanLightsCard extends LitElement {
     const conn = (this.hass as unknown as { connection?: { subscribeEvents?: (cb: (e: { data?: { url_path?: string | null } }) => void, type: string) => Promise<() => void> } }).connection;
     if (!this._unsub && conn?.subscribeEvents) {
       this._unsub = () => undefined;
-      conn.subscribeEvents((e) => { if ((e.data?.url_path ?? null) === this._urlPath) this._load(true); }, "lovelace_updated")
+      conn.subscribeEvents((e) => { if ((e.data?.url_path ?? null) === this._source.urlPath) this._load(true); }, "lovelace_updated")
         .then((u) => { this._unsub = u; }).catch(() => { this._unsub = undefined; });
     }
     if (!cfg.floors && !this._loading && Date.now() >= this._retryAt) this._load(false);
@@ -105,13 +108,14 @@ export class FloorplanLightsCard extends LitElement {
     const cfg = this._config; if (!cfg?.config_from || this._loading) return;
     this._loading = true;
     (this.hass as unknown as { callWS(m: object): Promise<{ views?: LovelaceView[] }> })
-      .callWS({ type: "lovelace/config", url_path: this._urlPath, ...(force ? { force: true } : {}) })
+      .callWS({ type: "lovelace/config", url_path: this._source.urlPath, ...(force ? { force: true } : {}) })
       .then((dash) => {
         if (this._config !== cfg && this._config?.config_from !== cfg.config_from) return;
         const base = this._config ?? cfg;
-        const view = dash.views?.find((v) => v.path === cfg.config_from);
+        const { view: viewPath } = this._source;
+        const view = dash.views?.find((v) => v.path === viewPath);
         const floors = view ? findFloorplan(view) : null;
-        if (!floors) { this._error = `No encuentro el plano en la pestaña «${cfg.config_from}»`; return; }
+        if (!floors) { this._error = `No encuentro el plano en «${cfg.config_from}»`; return; }
         this._error = undefined;
         this._config = { ...base, floors };
         this._watched = floors.flatMap(floorEntities);
@@ -119,7 +123,7 @@ export class FloorplanLightsCard extends LitElement {
       })
       .catch((e) => {
         console.warn("floorplan-lights-card: no se ha podido leer el plano", e);
-        this._error = "No se ha podido leer el plano del panel; se reintenta solo";
+        this._error = "No se ha podido leer el plano (¿panel solo para administradores?); se reintenta solo";
         this._retryAt = Date.now() + 15_000;
       })
       .finally(() => { this._loading = false; });

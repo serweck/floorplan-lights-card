@@ -175,3 +175,16 @@ describe("diseño", () => {
     expect((card as unknown as { getGridOptions(): object }).getGridOptions()).toEqual({ columns: 12, rows: 12, min_columns: 6, min_rows: 4, max_rows: 40 });
   });
 });
+
+describe("config_from entre paneles", () => {
+  it("panel/pestaña: pide la configuración de ese panel", async () => {
+    const fake = makeHass(); const ws: { url_path?: unknown }[] = [];
+    (fake.hass as unknown as { callWS: unknown }).callWS = async (m: { url_path?: unknown }) => { ws.push(m);
+      return { views: [{ path: "luces", cards: [{ type: "custom:floorplan-lights-card", floors: CONFIG.floors }] }] }; };
+    const card = document.createElement("floorplan-lights-card") as El;
+    card.setConfig({ compact: true, config_from: "dashboard-serweck-v2/luces" }); card.hass = fake.hass;
+    document.body.appendChild(card); await card.updateComplete; await new Promise((r) => setTimeout(r, 0)); await card.updateComplete;
+    expect(ws[0].url_path).toBe("dashboard-serweck-v2");
+    expect(card.shadowRoot!.querySelectorAll("[data-light]")).toHaveLength(4);
+  });
+});

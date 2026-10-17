@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.2 · 2026-10-17
+
+- `config_from` admite otro panel: `panel/pestaña` (p. ej. `dashboard-serweck-v2/luces`).
+
 ## 0.2.1 · 2026-10-17
 
 - Se puede estirar mucho más: hasta 40 filas (30 la compacta); HA limitaba a 8 si la tarjeta no decía nada.

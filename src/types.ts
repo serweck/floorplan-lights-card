@@ -67,7 +67,8 @@ export interface CardConfig {
   rail?: "top" | "side";
   theme?: "auto" | "day" | "night";
   default_floor?: string;
-  /** Usar el plano de la tarjeta de otra pestaña del mismo panel (su `path`), para no duplicarlo. */
+  /** Usar el plano de la tarjeta de otra pestaña (su `path`), para no duplicarlo: `luces` en el mismo panel
+   * o `panel/luces` en otro (p. ej. `dashboard-serweck-v2/luces`). */
   config_from?: string;
   floors: FloorConfig[];
 }
