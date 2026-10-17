@@ -7,7 +7,7 @@ import { styles } from "./styles";
 import "./editor";
 
 export const CARD_TAG = "floorplan-lights-card";
-export const CARD_VERSION = "0.1.0";
+export const CARD_VERSION = "0.1.1";
 /** Mantener pulsado más de esto abre el detalle de la luz en vez de encenderla. */
 const HOLD_MS = 500;
 

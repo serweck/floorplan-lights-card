@@ -33,6 +33,8 @@ export const styles = css`
        background: rgba(var(--fl-warm), .16); color: rgb(var(--fl-warm)); font-variant-numeric: tabular-nums; }
   .n.z { background: transparent; color: var(--fl-mut); }
   .plan-box { border-radius: 14px; overflow: hidden; }
+  /* El plano entero cabe en la pantalla: a todo el ancho de un panel sería más alto que la ventana. */
+  .body:not(.compact) .plan-box svg { max-height: 78vh; }
   .compact .plan-box { display: grid; place-items: center; }
   .compact .plan-box svg { max-height: 280px; width: auto; max-width: 100%; }
   svg.plan { display: block; width: 100%; height: auto; touch-action: manipulation; user-select: none; -webkit-user-select: none; }

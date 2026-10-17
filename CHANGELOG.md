@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.1 · 2026-10-17
+
+- La tarjeta completa limita la altura del plano a la pantalla (a todo el ancho de un panel se salía).
+
 ## 0.1.0 · 2026-10-17
 
 - Primera versión: plano por plantas con fachada, tabiques, puertas, estancias y rótulos.
