@@ -63,6 +63,8 @@ export interface CardConfig {
   type?: string;
   title?: string;
   compact?: boolean;
+  /** Dónde va el selector de planta: arriba (por defecto) o al lado, tipo ascensor. */
+  rail?: "top" | "side";
   theme?: "auto" | "day" | "night";
   default_floor?: string;
   /** Usar el plano de la tarjeta de otra pestaña del mismo panel (su `path`), para no duplicarlo. */

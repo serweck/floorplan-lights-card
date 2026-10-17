@@ -9,7 +9,9 @@ export const styles = css`
     --fl-red: 248, 113, 113;
     --fl-edit: 255, 159, 26;
   }
-  ha-card { overflow: hidden; }
+  /* La tarjeta ocupa el alto que le dé el panel (se puede cambiar su tamaño) y el plano llena lo que queda. */
+  :host { display: block; height: 100%; }
+  ha-card { overflow: hidden; height: 100%; display: flex; flex-direction: column; box-sizing: border-box; }
   .top { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 14px; flex-wrap: wrap; }
   .top .t { display: flex; gap: 8px; align-items: center; font-weight: 600; font-size: 15px; }
   .top .t ha-icon { --mdc-icon-size: 20px; }
@@ -20,24 +22,30 @@ export const styles = css`
   .btn.yes { background: rgba(var(--fl-red), .18); color: rgb(var(--fl-red)); }
   .btn.on { border-color: rgb(var(--fl-edit)); background: rgba(var(--fl-edit), .14); }
   .btn[disabled] { opacity: .4; cursor: default; }
-  .body { display: grid; grid-template-columns: 70px minmax(0, 1fr); gap: 12px; padding: 0 14px 14px; align-items: start; }
-  .body.compact { grid-template-columns: 60px minmax(0, 1fr); gap: 10px; padding: 0 12px 12px; }
-  @media (max-width: 480px) { .body:not(.compact) { grid-template-columns: minmax(0, 1fr); } .body:not(.compact) .rail { flex-direction: row; } .body:not(.compact) .rail button { flex: 1; } }
-  .rail { display: flex; flex-direction: column; gap: 6px; }
-  .rail button { border: 1px solid var(--fl-line); background: var(--fl-chip); color: var(--fl-mut); border-radius: 12px; padding: 8px 4px; cursor: pointer;
-                 display: grid; justify-items: center; gap: 2px; font: inherit; }
-  .rail button b { font-size: 21px; color: var(--primary-text-color); line-height: 1; }
+  .body { flex: 1 1 auto; min-height: 0; display: flex; gap: 12px; padding: 0 14px 14px; }
+  .body.compact { gap: 10px; padding: 0 12px 12px; }
+  .rail { display: flex; gap: 6px; }
+  .rail button { border: 1px solid var(--fl-line); background: var(--fl-chip); color: var(--fl-mut); border-radius: 12px; cursor: pointer; font: inherit; }
+  .rail button b { color: var(--primary-text-color); line-height: 1; }
   .rail button small { font-size: 11px; }
-  .rail button.on { box-shadow: inset 3px 0 0 rgb(var(--fl-warm)); border-color: var(--primary-text-color); }
+  /* Arriba: botones en fila que reparten el ancho. */
+  .rail.top { padding: 0 14px 10px; flex-wrap: wrap; }
+  .rail.top button { flex: 1 1 0; min-width: 0; display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 7px 8px; }
+  .rail.top button b { font-size: 16px; }
+  .rail.top button small { font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rail.top button.on { box-shadow: inset 0 -3px 0 rgb(var(--fl-warm)); border-color: var(--primary-text-color); color: var(--primary-text-color); }
+  /* Al lado: columna tipo ascensor. */
+  .rail.side { flex-direction: column; flex: none; width: 64px; }
+  .rail.side button { display: grid; justify-items: center; gap: 2px; padding: 8px 4px; }
+  .rail.side button b { font-size: 21px; }
+  .rail.side button.on { box-shadow: inset 3px 0 0 rgb(var(--fl-warm)); border-color: var(--primary-text-color); }
   .n { font-size: 11px; min-width: 18px; height: 18px; border-radius: 9px; display: inline-grid; place-items: center; padding: 0 5px;
        background: rgba(var(--fl-warm), .16); color: rgb(var(--fl-warm)); font-variant-numeric: tabular-nums; }
   .n.z { background: transparent; color: var(--fl-mut); }
-  .plan-box { border-radius: 14px; overflow: hidden; }
-  /* El plano entero cabe en la pantalla: a todo el ancho de un panel sería más alto que la ventana. */
-  .body:not(.compact) .plan-box svg { max-height: 78vh; }
-  .compact .plan-box { display: grid; place-items: center; }
-  .compact .plan-box svg { max-height: 280px; width: auto; max-width: 100%; }
-  svg.plan { display: block; width: 100%; height: auto; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+  .plan-box { flex: 1 1 auto; min-width: 0; min-height: 0; display: flex; border-radius: 14px; overflow: hidden; }
+  /* Sin alto fijo (paneles de columnas) el plano toma su proporción; con alto fijo lo llena y se centra. */
+  svg.plan { display: block; width: 100%; height: 100%; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+  .ed svg.plan { height: auto; }
   svg text { font-family: var(--paper-font-body1_-_font-family, Roboto, sans-serif); }
   svg .hit { cursor: pointer; }
   svg .nohit { pointer-events: none; }

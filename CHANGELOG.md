@@ -1,8 +1,9 @@
 # Changelog
 
-## 0.1.1 · 2026-10-17
+## 0.2.0 · 2026-10-17
 
-- La tarjeta completa limita la altura del plano a la pantalla (a todo el ancho de un panel se salía).
+- Tamaño ajustable: en los paneles por secciones se puede cambiar alto y ancho de la tarjeta y el plano llena el espacio.
+- El selector de planta va arriba, en fila (aprovecha el ancho); `rail: side` lo pone al lado, tipo ascensor.
 
 ## 0.1.0 · 2026-10-17
 

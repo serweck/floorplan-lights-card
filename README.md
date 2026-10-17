@@ -5,7 +5,8 @@ Tarjeta Lovelace para Home Assistant que dibuja el plano de la casa por plantas 
 - **Plano de arquitecto** a escala (metros): fachada, tabiques, huecos de puerta, cristaleras, puerta de garaje, estancias y rótulos.
 - **Cada luz** es un punto en su sitio. Encendida, ilumina su estancia, y la luz se para en las paredes. Las luces RGB brillan con su color real y el brillo cambia el halo.
 - **Tocar** enciende o apaga; **mantener** abre el detalle de HA.
-- **Selector de planta** tipo ascensor (1, 0, −1) con cuántas luces hay encendidas en cada una, y **«Apagar planta»** con confirmación.
+- **Selector de planta** (1, 0, −1) arriba o al lado, con cuántas luces hay encendidas en cada una, y **«Apagar planta»** con confirmación.
+- **Tamaño ajustable**: en los paneles por secciones se cambia desde el editor de HA (alto y ancho) y el plano llena el espacio.
 - **Modo día o noche** según el tema de HA (o fijo con `theme`).
 - **`compact: true`** para una portada: ascensor y miniplano.
 - **`config_from: <path>`**: usa el plano de la tarjeta de otra pestaña del mismo panel, para no duplicarlo.
@@ -31,6 +32,7 @@ La **estructura** (fachada, paredes y puertas) no se toca desde el editor visual
 type: custom:floorplan-lights-card
 title: Luces              # opcional
 compact: false            # opcional
+rail: top                 # top (selector de planta arriba) | side (al lado, tipo ascensor)
 theme: auto               # auto | day | night
 default_floor: pb         # opcional; si no, la primera planta con luz encendida
 floors:

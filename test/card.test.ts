@@ -161,3 +161,17 @@ describe("revisión", () => {
     expect(card.shadowRoot!.querySelectorAll("[data-light]")).toHaveLength(4);
   });
 });
+
+describe("diseño", () => {
+  it("el selector de planta va arriba por defecto y al lado con rail: side", async () => {
+    const top = await mount();
+    expect(top.$(".rail.top")).not.toBeNull();
+    expect(top.$(".body .rail")).toBeNull();
+    const side = await mount({ ...CONFIG, rail: "side" });
+    expect(side.$(".body .rail.side")).not.toBeNull();
+  });
+  it("tamaño ajustable en la cuadrícula de secciones", async () => {
+    const { card } = await mount();
+    expect((card as unknown as { getGridOptions(): object }).getGridOptions()).toEqual({ columns: 12, rows: 9, min_columns: 6, min_rows: 4 });
+  });
+});

@@ -7,7 +7,7 @@ import { styles } from "./styles";
 import "./editor";
 
 export const CARD_TAG = "floorplan-lights-card";
-export const CARD_VERSION = "0.1.1";
+export const CARD_VERSION = "0.2.0";
 /** Mantener pulsado más de esto abre el detalle de la luz en vez de encenderla. */
 const HOLD_MS = 500;
 
@@ -131,7 +131,12 @@ export class FloorplanLightsCard extends LitElement {
     clearTimeout(this._hold);
   }
 
-  getCardSize(): number { return this._config?.compact ? 5 : 9; }
+  getCardSize(): number { return this._config?.compact ? 6 : 9; }
+
+  /** Tamaño en la cuadrícula de los paneles por secciones: se puede cambiar desde el editor de HA. */
+  getGridOptions(): { columns: number; rows: number; min_columns: number; min_rows: number } {
+    return this._config?.compact ? { columns: 12, rows: 6, min_columns: 4, min_rows: 3 } : { columns: 12, rows: 9, min_columns: 6, min_rows: 4 };
+  }
 
   protected shouldUpdate(changed: PropertyValues): boolean {
     if (changed.size !== 1 || !changed.has("hass")) return true;
@@ -205,6 +210,10 @@ export class FloorplanLightsCard extends LitElement {
     if (!this._config.floors) return html`<ha-card><div class="top"><div class="t">Cargando el plano…</div></div></ha-card>`;
     const cfg = this._config; const hass = this.hass; const f = this._current();
     const total = totalOn(hass, cfg);
+    const side = cfg.rail === "side";
+    const rail = html`<div class="rail ${side ? "side" : "top"}" role="group" aria-label="Planta">${cfg.floors.map((x) => { const n = onCount(hass, x);
+      return html`<button class=${x.id === f.id ? "on" : ""} aria-label=${x.name} @click=${() => { this._floor = x.id; this._confirm = false; this._confirmFloor = undefined; }}>
+        <b>${x.level ?? ""}</b><small>${x.short ?? x.name}</small><span class="n ${n ? "" : "z"}">${n}</span></button>`; })}</div>`;
     const cf = cfg.floors.find((x) => x.id === this._confirmFloor) ?? f;
     const off = this._confirm
       ? html`<button class="btn yes" @click=${() => this._floorOff(cf.id)}>Sí, apagar ${cf.short ?? cf.name}</button><button class="btn" @click=${() => { this._confirm = false; this._confirmFloor = undefined; }}>No</button>`
@@ -214,10 +223,9 @@ export class FloorplanLightsCard extends LitElement {
         <div class="t"><ha-icon icon="mdi:lightbulb-group"></ha-icon>${cfg.title ?? "Luces"} <span class="count">${total} encendidas</span></div>
         <div>${off}</div>
       </div>
+      ${side ? nothing : rail}
       <div class="body ${cfg.compact ? "compact" : ""}">
-        <div class="rail" role="group" aria-label="Planta">${cfg.floors.map((x) => { const n = onCount(hass, x);
-          return html`<button class=${x.id === f.id ? "on" : ""} aria-label=${x.name} @click=${() => { this._floor = x.id; this._confirm = false; this._confirmFloor = undefined; }}>
-            <b>${x.level ?? ""}</b><small>${x.short ?? x.name}</small><span class="n ${n ? "" : "z"}">${n}</span></button>`; })}</div>
+        ${side ? rail : nothing}
         <div class="plan-box" @pointerdown=${this._down_} @pointerup=${this._up} @pointercancel=${this._cancel} @pointerleave=${this._cancel} @contextmenu=${(e: Event) => e.preventDefault()}>
           ${planSvg(f, hass, { key: `fl-${f.id}`, style: this._style, labels: !cfg.compact, dot: cfg.compact ? 0.26 : 0.2, pad: cfg.compact ? 0.35 : 0.6 })}
         </div>
